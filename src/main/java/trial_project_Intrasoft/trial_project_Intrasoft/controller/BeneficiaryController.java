@@ -10,10 +10,9 @@ import trial_project_Intrasoft.trial_project_Intrasoft.model.Beneficiary;
 import trial_project_Intrasoft.trial_project_Intrasoft.model.Transaction;
 import trial_project_Intrasoft.trial_project_Intrasoft.service.LoadCSV;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -81,5 +80,34 @@ public class BeneficiaryController {
         }
 
         return beneficiaryBalancePerAccount;
+    }
+
+    // Endpoint 5
+    @GetMapping("/beneficiaries/{beneficiaryId}/largestTransactionOfLastMonth")
+    public Transaction getLargestTransactionOfLastMonth(@PathVariable int beneficiaryId){
+        // Find all account Ids of a beneficiary
+        List<Integer> accountIds = LoadCSV.getAccounts().stream().filter(account -> account.getBeneficiaryID() == beneficiaryId).map(Account::getAccountId).toList();
+
+        // Find all transactions for each account
+        List<Transaction> transactionsByBeneficiaryId = LoadCSV.getTransactions().stream().filter(transaction -> accountIds.contains(transaction.getAccountId())).toList();
+
+        // Filter only the withdrawals
+        List<Transaction> withdrawalsByBeneficiaryId = transactionsByBeneficiaryId.stream().filter(transaction -> transaction.getType().equals("withdrawal")).toList();
+
+        // Format the date field and calculate when last month refers to
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yy");
+
+        // Last Transaction Date is 06/07/24, so I am using that as the reference date
+        // Meaning last month refers to 05/07/24 to 06/07/24
+        LocalDate referenceDate = LocalDate.of(2024, 6, 7);
+        LocalDate oneMonthAgo = referenceDate.minusMonths(1);
+
+        // Filter transactions to last's month's only and select the largest one
+        Optional<Transaction> largestTransaction = withdrawalsByBeneficiaryId.stream().filter(transaction -> {
+            LocalDate transactionDate = LocalDate.parse(transaction.getDate(), dateFormatter);  // Parse the date field
+            return !transactionDate.isBefore(oneMonthAgo);   // Return transactions within range only
+        }).max(Comparator.comparingDouble(Transaction::getAmount));
+
+        return largestTransaction.orElse(null);
     }
 }
