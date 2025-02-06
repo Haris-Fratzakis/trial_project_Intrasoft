@@ -1,4 +1,4 @@
-Project Description and Requirements
+## Project Description and Requirements
 ### Περιγραφή Άσκησης:
 Σε αυτήν την άσκηση, θα δημιουργήσετε ένα σύστημα διαχείρισης λογαριασμών χρησιμοποιώντας τρία αρχεία CSV που επισυνάπτονται.
 1. beneficiaries.csv : Το πεδίο beneficiaryId είναι μοναδικό για την κάθε εγγραφή.
@@ -17,7 +17,7 @@ Project Description and Requirements
 **Instructions**
 The project was developed in the Jetbrains IntelliJ IDEA IDE. I used Spring boot framework and used https://start.spring.io/ to generate the project structure.
 
-The project was built and run using the IDE. The REST endpoints were tested using Postman.
+The project was built and run using the IDE. The REST endpoints were tested using Postman. I am using the default localhost routing of Spring Web.
 
 There are 5 endpoints
 1) http://localhost:8080/api/beneficiaries/{beneficiaryId}. Returns the Beneficiary details in json format or null if no Beneficiary was found.
